@@ -3,7 +3,10 @@ from googleapiclient.discovery import build
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import YouTube
 import os
+import asyncio
+import ssl
 
+ssl._create_default_https_context = ssl._create_unverified_context
 youtube_api_key = os.getenv("YOUTUBE_API_KEY")
 VIDEO_PATH = "app/videoData"
 
@@ -25,18 +28,34 @@ def get_youtube_transcript(video_id) -> dict:
     # Fetching the transcript
     try:
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        transcript = transcript_list.find_generated_transcript(['en']).fetch()
+        transcript = transcript_list.find_transcript(['en']).fetch()
+        print("got transcript")
         return transcript
     except Exception as e:
         print(e)
         return str(e)
 
+def get_transcription_result_from_yt(video_id):
+
+    result: list = get_youtube_transcript(video_id)
+
+    if isinstance(result, list):
+        print("got youtube transcript")
+        transcript = ""
+        for item in result:
+            transcript += item["text"] + " "
+            item['end'] = item['start'] + item['duration']
+
+        return result
+    else:
+        return None
 
 def download_video(video_id) -> str:
     """
         Input: video_id
         Output: path to the downloaded video
     """
+    print("downloading video: ", video_id)
     url = "https://www.youtube.com/watch?v=" + video_id
     yt = YouTube(url, 
         use_oauth=True, 
@@ -73,3 +92,19 @@ def split_video(video_id, start_time, end_time) -> str:
     output_filename = VIDEO_PATH + "/" + video_id + "_" + start_time + "_" + end_time + ".mp4"
     os.system(f"ffmpeg -i {filename} -ss {start_time} -to {end_time} -c copy {output_filename}")
     return output_filename
+
+# combine a transcript with time stamp
+def combine_transcript(transcriptItem) -> dict:
+        print(transcriptItem)
+        time_stamp_density = 2
+        # combine the transcript
+        time_stamp_result = ""
+        for i, item in enumerate(transcriptItem):
+            start_time = item["start"]
+            end_time = item["end"]
+            if i % time_stamp_density == 0:
+                time_stamp_result += item["text"] + "[start: " + str(start_time) + ", end: " + str(end_time) + "] "
+            else:
+                time_stamp_result += item["text"] + " "
+
+        return time_stamp_result
