@@ -61,5 +61,4 @@ def extract(src, dest_dir, width = 720, height = 480):
 
     return frames
 
-
-extract("samples/Tidead.mp4", "samples/frames")
+#extract("samples/Tidead.mp4", "samples/frames")
