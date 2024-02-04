@@ -10,7 +10,7 @@ def imgs_to_base64s(imgs):
             base64s.append(base64.b64encode(image_file.read()))
     return base64s
 
-def base64s_to_text(base64s):
+def base64s_to_text(base64s, gpt_tokens = 500):
     # update prompt to optimize what gets returned
     content = [{ "type": "text", "text": "What's in the images?" }]
     for base64 in base64s:
@@ -25,13 +25,13 @@ def base64s_to_text(base64s):
             "role": "user",
             "content": content
         }],
-        max_tokens=500,
+        max_tokens = gpt_tokens,
     )
 
     return response.choices[0].message.content
 
-def parse(imgs):
-    return base64s_to_text(imgs_to_base64s(imgs))
+def parse(imgs, gpt_tokens = 500):
+    return base64s_to_text(imgs_to_base64s(imgs), gpt_tokens)
 
 #res = parse([
 #    '/home/maxzh/git/tutor-ai/keyframe_extractor/samples/frames/Tidead_frame06.jpeg',
