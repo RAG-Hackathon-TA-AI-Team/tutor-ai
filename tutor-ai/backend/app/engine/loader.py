@@ -9,7 +9,7 @@ from llama_index import SimpleDirectoryReader, Document
 
 def get_mock_documents() -> List[Document]:
     # transcripts
-    transcript_text = "My name is John"
+    transcript_text = Document.example().text
     transcript_meta = create_transcript_meta(
         video_path="./video/example.mp4",
         start_time=0.0,
@@ -18,7 +18,6 @@ def get_mock_documents() -> List[Document]:
     )
 
     # keyframes
-    keyframe_text = "I love play tennis"
     keyframe_meta = create_keyframe_meta(
         video_path="./video/example.mp4",
         start_time=0.0,
@@ -31,7 +30,7 @@ def get_mock_documents() -> List[Document]:
         metadata=transcript_meta,
     )
     keyframe_doc = Document(
-        text=keyframe_text,
+        text="",
         metadata=keyframe_meta,
     )
 
