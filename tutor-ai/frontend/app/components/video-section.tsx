@@ -35,14 +35,14 @@ const VideoSection: React.FC = () => {
     }
   };
 
-  const sendVideoUrl =async (videoUrl: string) => {
+  const sendVideoUrl = async (videoId: string) => {
     try {
-      const response = await fetch('http://localhost:8000/upload_video', { // Change the URL to your backend URL
+      const response = await fetch('http://localhost:8000/api/process_video', { // Change the URL to your backend URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ videoUrl }),
+        body: JSON.stringify({ "video_id": videoId }),
       });
 
       if (!response.ok) {
@@ -68,7 +68,7 @@ const VideoSection: React.FC = () => {
     setQueue([...queue, { id, title }]);
 
     // Send video to backend
-    sendVideoUrl(videoUrl);
+    sendVideoUrl(id);
 
     // If it's the first video, start playing immediately
     if (currentVideoIndex === null) {
@@ -110,7 +110,7 @@ const VideoSection: React.FC = () => {
         <div className='overflow-auto max-h-96'>
           <ul className="list-none">
             {queue.map((item, index) => (
-              <li key={index} className='cursor-pointer font-mono text-sm border-solid rounded-lg p-4 m-2 bg-gradient-to-r from-purple-200 hover:bg-pink-200 hover:ring hover:ring-offset-2 hover:ring-neutral-300'
+              <li key={index} className='cursor-pointer font-mono text-sm border-solid rounded-lg p-4 m-2 bg-gradient-to-r from-purple-300 hover:bg-pink-200 hover:ring hover:ring-offset-2 hover:ring-violet-300'
                 onClick={() => handleQueueItemClick(index)}>
                 {item.title}
               </li>
@@ -133,7 +133,7 @@ const VideoSection: React.FC = () => {
           />
           {/* Button to submit the URL */}
             <Button onClick={handleVideoSubmit} className='bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 '>
-              Load Video
+              Import Video
             </Button>
         </div>
 
