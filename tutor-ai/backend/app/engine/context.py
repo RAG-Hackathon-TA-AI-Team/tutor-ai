@@ -33,7 +33,7 @@ def create_storage_context():
     astra_db_store = AstraDBVectorStore(
         token="AstraCS:phGMiukriFDqacgHjsZZSxOD:9a2e970d6f0230de5290fcb13e3dec8db116c28a8ab9b20ea23e4da0841658fb",
         api_endpoint="https://1cc8497e-1486-4e21-83f4-9911c31d9ca8-us-east-1.apps.astra.datastax.com",
-        collection_name="test1",
+        collection_name="demo",
         embedding_dimension=1536,
     )
 
