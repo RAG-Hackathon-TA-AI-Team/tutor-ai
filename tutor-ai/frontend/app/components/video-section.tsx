@@ -77,89 +77,53 @@ const VideoSection: React.FC = () => {
   }, [currentVideoIndex]);
 
   return (
-    <div className="max-w-5xl	">
+    <div className="flex flex-row space-y-4 max-w-5xl w-full">
 
       {/* Queue List on the Left Below */}
-      <div className="queue-container">
-        <h2>Queue List</h2>
-        <ul>
-          {queue.map((item, index) => (
-            <li key={index} onClick={() => handleQueueItemClick(index)}>
-              {item.title}
-            </li>
-          ))}
-        </ul>
+      <div className="mr-3 w-1/3">
+        <p className="font-mono text-md font-bold p-2 m-2">Resource List</p>
+        <div className='overflow-auto max-h-96'>
+          <ul className="list-none md:list-disc list-outside">
+            {queue.map((item, index) => (
+              <li key={index} className='cursor-pointer font-mono text-sm border-solid rounded-lg p-3 m-2 bg-gradient-to-r from-purple-300 hover:bg-pink-400'
+                onClick={() => handleQueueItemClick(index)}>
+                {item.title}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Video View on the Right Below */}
-      <div className="video-view-container">
+      <div className="flex flex-col flex-1">
         {/* Input text box for YouTube URL and Button at the Top */}
-        <div className="flex w-full items-start justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 p-2">
           <Input
             autoFocus
             type="text"
             placeholder="Enter YouTube URL"
             value={videoUrl}
             onChange={handleInputChange}
-            className="url-input flex-2"
+            className="url-input mr-1 flex-1"
           />
           {/* Button to submit the URL */}
-          <Button onClick={handleVideoSubmit}>
-            Show Video
+          <Button onClick={handleVideoSubmit} className='bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 ...'>
+            Load Video
           </Button>
         </div>
 
         {/* Display YouTube video */}
         {currentVideoIndex !== null && (
-          <>
-            <h2>{queue[currentVideoIndex].title}</h2>
+          <div className="flex items-center justify-between p-2">
             <YouTube
               videoId={queue[currentVideoIndex].id}
               opts={youtubeOptions}
               className="youtube-video"
             />
-          </>
+          </div>
         )}
       </div>
       
-      <style jsx>{`
-        .video-section-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px;
-          display: flex;
-          flex-direction: row;
-        }
-
-        .queue-container {
-          width: 30%;
-          margin-right: 20px;
-        }
-
-        .video-view-container {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        ul {
-          list-style-type: none;
-          padding: 0;
-        }
-
-        li {
-          cursor: pointer;
-          padding: 8px;
-          margin: 4px;
-          background-color: #eee;
-        }
-
-        li:hover {
-          background-color: #ddd;
-        }
-
-        /* Your existing styling styles here */
-      `}</style>
     </div>
   );
 };
