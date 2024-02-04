@@ -1,13 +1,10 @@
-// app/components/VideoSection.tsx
-
-'use client';
-// components/VideoSection.tsx
+"use client";
 
 import dynamic from 'next/dynamic';
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import YouTube from 'react-youtube';
-
-// use client;
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 const VideoSection: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState<string>('');
@@ -80,7 +77,8 @@ const VideoSection: React.FC = () => {
   }, [currentVideoIndex]);
 
   return (
-    <div className="video-section-container">
+    <div className="max-w-5xl	">
+
       {/* Queue List on the Left Below */}
       <div className="queue-container">
         <h2>Queue List</h2>
@@ -96,18 +94,19 @@ const VideoSection: React.FC = () => {
       {/* Video View on the Right Below */}
       <div className="video-view-container">
         {/* Input text box for YouTube URL and Button at the Top */}
-        <div className="input-container">
-          <input
+        <div className="flex w-full items-start justify-between gap-2">
+          <Input
+            autoFocus
             type="text"
             placeholder="Enter YouTube URL"
             value={videoUrl}
             onChange={handleInputChange}
-            className="url-input"
+            className="url-input flex-2"
           />
           {/* Button to submit the URL */}
-          <button onClick={handleVideoSubmit} className="submit-button">
+          <Button onClick={handleVideoSubmit}>
             Show Video
-          </button>
+          </Button>
         </div>
 
         {/* Display YouTube video */}
@@ -122,10 +121,10 @@ const VideoSection: React.FC = () => {
           </>
         )}
       </div>
-
+      
       <style jsx>{`
         .video-section-container {
-          max-width: 800px;
+          max-width: 1200px;
           margin: 0 auto;
           padding: 20px;
           display: flex;
@@ -157,30 +156,6 @@ const VideoSection: React.FC = () => {
 
         li:hover {
           background-color: #ddd;
-        }
-
-        .input-container {
-          display: flex;
-          align-items: center;
-          margin-bottom: 10px;
-        }
-
-        .url-input {
-          flex: 1;
-          margin-right: 10px;
-          padding: 8px;
-        }
-
-        .submit-button {
-          background-color: #ff7e5f; /* Orange color */
-          color: #ffffff;
-          border: none;
-          padding: 10px 20px;
-          cursor: pointer;
-        }
-
-        .submit-button:hover {
-          background-color: #ff5b3f; /* Darker shade on hover */
         }
 
         /* Your existing styling styles here */
