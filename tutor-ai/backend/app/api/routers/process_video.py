@@ -9,6 +9,8 @@ import json
 from app.tools.openai.generate import GPTSummarizer
 from app.tools.youtube.video_processor import download_video, get_transcription_result_from_yt, combine_transcript, split_video
 
+from keyframe_extractor import extractor
+
 video_router = r = APIRouter()
 
 # data structure 
@@ -91,13 +93,24 @@ async def process_video(
     # chunk video
     # chunked_text: list[any] = chunk_video(video_caption_with_time_stamp)
 
+    frame_list = chunk_list
+
     for chunk in chunk_list:
         file_path = split_video(video_id, chunk["start_time"], chunk["end_time"])
         chunk['video_path'] = file_path
 
+    output_dir = "app/output/" + video_id
     # write to chunk_list to a json file
-    with open("app/output/" + video_id + "TRANSCRIPT.json", 'w') as f:
+    with open(output_dir + "TRANSCRIPT.json", 'w') as f:
         json.dump(chunk_list, f)
+
+    frames_dir = output_dir + "_frames"
+    for frame in frame_list:
+        file_path = split_video(video_id, chunk["start_time"], chunk["end_time"])
+        frame['video_path'] = file_path
+        frame['frames'] = extractor(file_path, frames_dir)
+    with open(output_dir + "FRAMES.json", 'w') as f:
+        json.dump(frame_list, f)
 
     return "success"
 
