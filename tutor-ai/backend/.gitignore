@@ -1,4 +1,6 @@
 __pycache__
 storage
 .env
+app/videoData/
+app/output/
 *.idea

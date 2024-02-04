@@ -6,6 +6,7 @@ import logging
 import os
 import uvicorn
 from app.api.routers.chat import chat_router
+from app.api.routers.process_video import video_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,7 +26,8 @@ if environment == "dev":
         allow_headers=["*"],
     )
 
-app.include_router(chat_router, prefix="/api/chat")
+app.include_router(chat_router, prefix="/api")
+app.include_router(video_router, prefix="/api")
 
 
 if __name__ == "__main__":

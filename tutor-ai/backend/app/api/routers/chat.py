@@ -21,7 +21,7 @@ class _ChatData(BaseModel):
     messages: List[_Message]
 
 
-@r.post("")
+@r.post("/chat")
 async def chat(
     request: Request,
     data: _ChatData,
