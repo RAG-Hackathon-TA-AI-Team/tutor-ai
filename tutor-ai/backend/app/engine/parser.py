@@ -59,7 +59,7 @@ def parse_keyframe_nodes(docs: List[Document]) -> List[BaseNode]:
 
     chain_inputs = []
     for doc in docs:
-        frames = doc.metadata['frames']
+        frames = doc.metadata['frames'].split(',')
         encoded_images = [
             encode_image(frame_path)
             for frame_path in frames
@@ -78,7 +78,7 @@ def parse_keyframe_nodes(docs: List[Document]) -> List[BaseNode]:
             ]
         ])
         chain_inputs.append({
-            "frames": human_message,
+            "frames": [human_message],
         })
 
     # parallelize the model invocations
@@ -91,7 +91,7 @@ def parse_keyframe_nodes(docs: List[Document]) -> List[BaseNode]:
                 doc.metadata["video_path"],
                 doc.metadata["start_time"],
                 doc.metadata["end_time"],
-                doc.metadata["frames"],
+                doc.metadata['frames'].split(','),
                 descriptions[i],
             )
         )

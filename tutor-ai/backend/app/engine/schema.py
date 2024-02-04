@@ -16,7 +16,7 @@ class VideoMetadata(TypedDict, total=False):
     start_time: float
     end_time: float
     text: Optional[str]
-    frames: Optional[List[str]]
+    frames: Optional[str]
 
 
 EXCLUDED_KEYS = [
@@ -55,7 +55,7 @@ def create_keyframe_meta(
         "video_path": video_path,
         "start_time": start_time,
         "end_time": end_time,
-        "frames": frames,
+        "frames": ",".join(frames),
     }
 
 
