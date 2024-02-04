@@ -9,7 +9,7 @@ import json
 from app.tools.openai.generate import GPTSummarizer
 from app.tools.youtube.video_processor import download_video, get_transcription_result_from_yt, combine_transcript, split_video
 
-from keyframe_extractor import extractor
+from app.api.routers.keyframe_extractor import extractor
 
 video_router = r = APIRouter()
 

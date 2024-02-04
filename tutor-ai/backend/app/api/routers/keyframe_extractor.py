@@ -67,4 +67,4 @@ def extract(src, dest_dir, start_time = 0.0, width = 720, height = 480):
         print(str(frame['pts']) + " " + str(frame['time']) + " " + str(frame['pos']))
     return frames
 
-extract("/home/maxzh/git/tutor-ai/data/Tidead.mp4", "/home/maxzh/git/tutor-ai/data/frames")
+extract("../home/maxzh/git/tutor-ai/data/Tidead.mp4", "/home/maxzh/git/tutor-ai/data/frames")
