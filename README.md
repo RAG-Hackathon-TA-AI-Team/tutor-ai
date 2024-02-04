@@ -27,4 +27,4 @@ If you met any problem, checkout https://platform.openai.com/docs/quickstart?con
 ## Current Status
 Created python library keyframe_extractor.extractor. keyframe_extractor.extractor.extract() extracts key frames from a video. It takes in parameter src, which is path to the source video, and a parameter dest_dir, which is where output frames are stored.
 Created python library image_to_test.parser. image_to_test.parser.parse() takes in a vector of image filenames, and output a single string from Vision GPT-4 summarizing those images.
-Checkout /example for usages.
+Checkout example.py for usages.
