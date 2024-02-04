@@ -1,107 +1,189 @@
 // app/components/VideoSection.tsx
 
 'use client';
-import dynamic from 'next/dynamic';
-import React, { useState, ChangeEvent } from 'react';
-import YouTube from 'react-youtube';
-import Slider from 'react-slick';
+// components/VideoSection.tsx
 
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import dynamic from 'next/dynamic';
+import React, { useState, ChangeEvent, useEffect } from 'react';
+import YouTube from 'react-youtube';
+
+// use client;
 
 const VideoSection: React.FC = () => {
-  const [videoUrls, setVideoUrls] = useState<string[]>([]);
-  const [videoIds, setVideoIds] = useState<string[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [queue, setQueue] = useState<{ id: string; title: string }[]>([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState<number | null>(null);
 
-  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const value = event.target.value;
-    setVideoUrls(value.split('\n').map(url => url.trim()));
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setVideoUrl(event.target.value);
+  };
+
+  const fetchVideoTitle = async (videoId: string) => {
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=AIzaSyB8weUJgIcYroqe9DXl58YvlomjmDHPnz0`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video title: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const title = data.items?.[0]?.snippet?.title || 'Video Title Not Available';
+
+      return title;
+    } catch (error) {
+      console.error('Error fetching video title:', error);
+      return 'Video Title Not Available';
+    }
   };
 
   const handleVideoSubmit = async () => {
-    // Extract video IDs from the YouTube URLs
-    const ids = videoUrls.map(url => {
-      const urlParts = url.split(/[?&]/);
-      const videoIdMatch = urlParts.find(part => part.startsWith('v='));
-      return videoIdMatch ? videoIdMatch.split('=')[1] : '';
-    });
+    const urlParts = videoUrl.split('v=');
+    const id = urlParts[1];
 
-    // Set the video IDs in the state
-    setVideoIds(ids.filter(id => id));
+    // Fetch video title
+    const title = await fetchVideoTitle(id);
 
-    // Send the video URLs to the backend
-    try {
-      const response = await fetch('/api/youtube', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ videoUrls }),
-      });
+    // Add video to the queue with title
+    setQueue([...queue, { id, title }]);
 
-      if (response.ok) {
-        console.log('Video URLs sent to the backend successfully');
-      } else {
-        console.error('Failed to send video URLs to the backend');
-      }
-    } catch (error) {
-      console.error('Error sending video URLs to the backend:', error);
+    // If it's the first video, start playing immediately
+    if (currentVideoIndex === null) {
+      setCurrentVideoIndex(0);
     }
+  };
+
+  const handleQueueItemClick = (index: number) => {
+    setCurrentVideoIndex(index);
   };
 
   const youtubeOptions = {
     width: '640',
     height: '360',
     playerVars: {
-      autoplay: 1,
+      autoplay: 0, // Set autoplay to 0 to disable autoplay
     },
   };
 
-  const sliderSettings = {
-    dots: true,
-    infinite: false,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
+  useEffect(() => {
+    // Ensure the video title is available when changing the currentVideoIndex
+    if (currentVideoIndex !== null) {
+      fetchVideoTitle(queue[currentVideoIndex].id).then((title) => {
+        setQueue((prevQueue) => {
+          const updatedQueue = [...prevQueue];
+          updatedQueue[currentVideoIndex].title = title;
+          return updatedQueue;
+        });
+      });
+    }
+  }, [currentVideoIndex]);
 
   return (
     <div className="video-section-container">
-      {/* Input textarea for YouTube URLs */}
-      <div className="input-container">
-        <textarea
-          placeholder="Enter YouTube URLs (one per line)"
-          value={videoUrls.join('\n')}
-          onChange={handleInputChange}
-          className="url-input"
-        />
-        {/* Button to submit the URLs */}
-        <button onClick={handleVideoSubmit} className="submit-button">
-          Show Videos
-        </button>
+      {/* Queue List on the Left Below */}
+      <div className="queue-container">
+        <h2>Queue List</h2>
+        <ul>
+          {queue.map((item, index) => (
+            <li key={index} onClick={() => handleQueueItemClick(index)}>
+              {item.title}
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {/* Display YouTube videos in a horizontal slider */}
-      {videoIds.length > 0 && (
-        <Slider {...sliderSettings} className="video-slider">
-          {videoIds.map((id, index) => (
-            <div key={index} className="video-container">
-              <YouTube
-                videoId={id}
-                opts={youtubeOptions}
-                className="youtube-video"
-              />
-            </div>
-          ))}
-        </Slider>
-      )}
+      {/* Video View on the Right Below */}
+      <div className="video-view-container">
+        {/* Input text box for YouTube URL and Button at the Top */}
+        <div className="input-container">
+          <input
+            type="text"
+            placeholder="Enter YouTube URL"
+            value={videoUrl}
+            onChange={handleInputChange}
+            className="url-input"
+          />
+          {/* Button to submit the URL */}
+          <button onClick={handleVideoSubmit} className="submit-button">
+            Show Video
+          </button>
+        </div>
+
+        {/* Display YouTube video */}
+        {currentVideoIndex !== null && (
+          <>
+            <h2>{queue[currentVideoIndex].title}</h2>
+            <YouTube
+              videoId={queue[currentVideoIndex].id}
+              opts={youtubeOptions}
+              className="youtube-video"
+            />
+          </>
+        )}
+      </div>
 
       <style jsx>{`
-        /* Styles remain the same */
-
-        .video-slider {
-          margin-top: 20px;
+        .video-section-container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+          display: flex;
+          flex-direction: row;
         }
+
+        .queue-container {
+          width: 30%;
+          margin-right: 20px;
+        }
+
+        .video-view-container {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        ul {
+          list-style-type: none;
+          padding: 0;
+        }
+
+        li {
+          cursor: pointer;
+          padding: 8px;
+          margin: 4px;
+          background-color: #eee;
+        }
+
+        li:hover {
+          background-color: #ddd;
+        }
+
+        .input-container {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        .url-input {
+          flex: 1;
+          margin-right: 10px;
+          padding: 8px;
+        }
+
+        .submit-button {
+          background-color: #ff7e5f; /* Orange color */
+          color: #ffffff;
+          border: none;
+          padding: 10px 20px;
+          cursor: pointer;
+        }
+
+        .submit-button:hover {
+          background-color: #ff5b3f; /* Darker shade on hover */
+        }
+
+        /* Your existing styling styles here */
       `}</style>
     </div>
   );
