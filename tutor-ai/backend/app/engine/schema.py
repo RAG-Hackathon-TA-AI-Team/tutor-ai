@@ -1,6 +1,8 @@
 import os
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, List
 from enum import Enum
+
+from llama_index import Document
 
 
 class VideoMetaType(str, Enum):
@@ -14,14 +16,24 @@ class VideoMetadata(TypedDict, total=False):
     start_time: float
     end_time: float
     text: Optional[str]
-    frame_path: Optional[str]
+    frames: Optional[List[str]]
+
+
+EXCLUDED_KEYS = [
+    "type",
+    "video_path",
+    "start_time",
+    "end_time",
+    "frames",
+    "text",
+]
 
 
 def create_transcript_meta(
         video_path: str,
         start_time: float,
         end_time: float,
-        text: Optional[str],
+        text: str,
 ) -> VideoMetadata:
     return {
         "type": VideoMetaType.TRANSCRIPT,
@@ -36,12 +48,53 @@ def create_keyframe_meta(
         video_path: str,
         start_time: float,
         end_time: float,
-        frame_path: str,
+        frames: List[str],
 ) -> VideoMetadata:
     return {
         "type": VideoMetaType.KEYFRAME,
         "video_path": video_path,
         "start_time": start_time,
         "end_time": end_time,
-        "frame_path": frame_path,
+        "frames": frames,
     }
+
+
+def create_transcript_doc(
+        video_path: str,
+        start_time: float,
+        end_time: float,
+        text: str,
+) -> Document:
+    metadata = create_transcript_meta(
+        video_path=video_path,
+        start_time=start_time,
+        end_time=end_time,
+        text=text,
+    )
+
+    return Document(
+        text=text,
+        metadata=metadata,
+        excluded_embed_metadata_keys=EXCLUDED_KEYS,
+    )
+
+
+def create_keyframe_doc(
+        video_path: str,
+        start_time: float,
+        end_time: float,
+        frames: List[str],
+        text: str = "",
+) -> Document:
+    metadata = create_keyframe_meta(
+        video_path=video_path,
+        start_time=start_time,
+        end_time=end_time,
+        frames=frames,
+    )
+
+    return Document(
+        text=text,
+        metadata=metadata,
+        excluded_embed_metadata_keys=EXCLUDED_KEYS,
+    )
