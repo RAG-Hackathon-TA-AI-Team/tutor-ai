@@ -35,6 +35,28 @@ const VideoSection: React.FC = () => {
     }
   };
 
+  const sendVideoUrl =async (videoUrl: string) => {
+    try {
+      const response = await fetch('http://localhost:8000/upload_video', { // Change the URL to your backend URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload video URL to backend: ${response.status} - ${response.statusText}`);
+      }
+
+      console.log('Video URL successfully sent to backend.');
+      // Handle success response from backend if needed
+    } catch (error) {
+      console.error('Error sending video URL to backend:', error);
+      // Handle error response from backend if needed
+    }
+  }
+
   const handleVideoSubmit = async () => {
     const urlParts = videoUrl.split('v=');
     const id = urlParts[1];
@@ -44,6 +66,9 @@ const VideoSection: React.FC = () => {
 
     // Add video to the queue with title
     setQueue([...queue, { id, title }]);
+
+    // Send video to backend
+    sendVideoUrl(videoUrl);
 
     // If it's the first video, start playing immediately
     if (currentVideoIndex === null) {
@@ -56,8 +81,8 @@ const VideoSection: React.FC = () => {
   };
 
   const youtubeOptions = {
-    width: '640',
-    height: '360',
+    width: '720',
+    height: '400',
     playerVars: {
       autoplay: 0, // Set autoplay to 0 to disable autoplay
     },
@@ -83,9 +108,9 @@ const VideoSection: React.FC = () => {
       <div className="mr-3 w-1/3">
         <p className="font-mono text-md font-bold p-2 m-2">Resource List</p>
         <div className='overflow-auto max-h-96'>
-          <ul className="list-none md:list-disc list-outside">
+          <ul className="list-none">
             {queue.map((item, index) => (
-              <li key={index} className='cursor-pointer font-mono text-sm border-solid rounded-lg p-3 m-2 bg-gradient-to-r from-purple-300 hover:bg-pink-400'
+              <li key={index} className='cursor-pointer font-mono text-sm border-solid rounded-lg p-4 m-2 bg-gradient-to-r from-purple-200 hover:bg-pink-200 hover:ring hover:ring-offset-2 hover:ring-neutral-300'
                 onClick={() => handleQueueItemClick(index)}>
                 {item.title}
               </li>
@@ -107,9 +132,9 @@ const VideoSection: React.FC = () => {
             className="url-input mr-1 flex-1"
           />
           {/* Button to submit the URL */}
-          <Button onClick={handleVideoSubmit} className='bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 ...'>
-            Load Video
-          </Button>
+            <Button onClick={handleVideoSubmit} className='bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 '>
+              Load Video
+            </Button>
         </div>
 
         {/* Display YouTube video */}
