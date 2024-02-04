@@ -10,6 +10,6 @@ def create_base_context():
     embed_model = os.getenv("EMBED_MODEL", "text-embedding-3-small")
 
     return ServiceContext.from_defaults(
-        llm=OpenAI(model=model, max_new_tokens=1024),
+        llm=OpenAI(model=model, max_new_tokens=4096, max_tokens=4096),
         embed_model=OpenAIEmbedding(model=embed_model),
     )

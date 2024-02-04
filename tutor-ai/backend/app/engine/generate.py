@@ -1,12 +1,12 @@
 import logging
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 from app.engine.constants import DATA_DIR, STORAGE_DIR
 from app.engine.context import create_service_context, create_storage_context
 from app.engine.loader import get_documents
 
-load_dotenv()
+load_dotenv(find_dotenv())
 
 from llama_index import (
     SimpleDirectoryReader,

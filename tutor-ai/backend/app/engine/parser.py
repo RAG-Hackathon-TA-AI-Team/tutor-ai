@@ -41,7 +41,7 @@ def get_frames_to_text_chain():
 
 
 def parse_transcript_nodes(docs: List[Document]) -> List[BaseNode]:
-    splitter = SentenceSplitter(chunk_size=512, chunk_overlap=32)
+    splitter = SentenceSplitter(chunk_size=700, chunk_overlap=32)
     nodes = splitter.get_nodes_from_documents(docs)
     return [
         create_transcript_doc(
