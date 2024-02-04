@@ -3,7 +3,7 @@ import logging
 from dotenv import load_dotenv
 
 from app.engine.constants import DATA_DIR, STORAGE_DIR
-from app.engine.context import create_service_context
+from app.engine.context import create_service_context, create_storage_context
 from app.engine.loader import get_documents
 
 load_dotenv()
@@ -17,11 +17,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 
-def generate_datasource(service_context):
+def generate_datasource(service_context, storage_context):
     logger.info("Creating new index")
     # load the documents and create the index
     documents = get_documents()
-    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
+    index = VectorStoreIndex.from_documents(
+        documents,
+        service_context=service_context,
+        storage_context=storage_context,
+    )
     # store it for later
     index.storage_context.persist(STORAGE_DIR)
     logger.info(f"Finished creating new index. Stored in {STORAGE_DIR}")
@@ -29,4 +33,5 @@ def generate_datasource(service_context):
 
 if __name__ == "__main__":
     service_context = create_service_context()
-    generate_datasource(service_context)
+    storage_context = create_storage_context()
+    generate_datasource(service_context, storage_context)
