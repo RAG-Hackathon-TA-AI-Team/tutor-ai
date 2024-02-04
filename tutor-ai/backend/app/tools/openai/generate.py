@@ -7,7 +7,7 @@ from app.tools.openai.prompt import chunk_time_stamp_prompt
 import os
 
 
-os.environ['OPENAI_API_KEY'] = "Key Here"
+os.environ['OPENAI_API_KEY'] = "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"
 class GPTSummarizer(object):
 
     def __init__(self):

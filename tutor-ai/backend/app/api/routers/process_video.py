@@ -44,6 +44,32 @@ def chunk_video(full_transcript_with_time_stamp):
 
     return chunked_text_dict
 
+def search_chunk_transcription(start, end, TranscriptItem):
+        chunk_text = ""
+        for text_block in TranscriptItem:
+            if text_block["start"] >= start and text_block["start"] <= end:
+                chunk_text += text_block['text'] + " "
+
+        return chunk_text
+
+def chunk_video_by_fixed_time(video_caption, last_name, chunk_duration=180):
+    # check lenth of the transcript and chunkize it if too long
+    number_of_chunks = int(last_name / chunk_duration) + 1
+    chunked_text_list = []
+    for i in range(number_of_chunks):
+        start = i * chunk_duration
+        end = min((i + 1) * chunk_duration, last_name)
+        chunk_text = search_chunk_transcription(start, end, video_caption)
+        chunk = {
+            "start_time": start,
+            "end_time": end,
+            "text": chunk_text
+        }
+        chunked_text_list.append(chunk)
+    return chunked_text_list
+
+
+
 @r.post("/process_video")
 async def process_video(
     request: Request,
@@ -53,33 +79,27 @@ async def process_video(
     video_id: str = data.video_id
 
     # download video
-    video_path: str = download_video(video_id)
+    _ = download_video(video_id)
 
     # get transcript
-    video_caption: dict = get_transcription_result_from_yt(video_id)
+    video_caption, last_time = get_transcription_result_from_yt(video_id)
+   
+    # chunk video by fixed time
+    chunk_list = chunk_video_by_fixed_time(video_caption, last_time)
 
-    print(video_caption)
+    # video_caption_with_time_stamp: dict = combine_transcript(video_caption)
     # chunk video
-    video_caption_with_time_stamp: dict = combine_transcript(video_caption)
+    # chunked_text: list[any] = chunk_video(video_caption_with_time_stamp)
 
-    print(video_caption_with_time_stamp)
+    for chunk in chunk_list:
+        file_path = split_video(video_id, chunk["start_time"], chunk["end_time"])
+        chunk['video_path'] = file_path
 
-    # chunk video
-    chunked_text: list[any] = chunk_video(video_caption_with_time_stamp)
+    # write to chunk_list to a json file
+    with open("app/output/" + video_id + "TRANSCRIPT.json", 'w') as f:
+        json.dump(chunk_list, f)
 
-    splitted_video_list: List[str] = []
-    for chunk in chunked_text:
-        splitted_video_list.append(split_video(video_id, chunk["start"], chunk["end"]))
-
-
-    # return success response with status 200 and a json file
-    return {
-        "video_path": video_path,
-        "video_caption": video_caption,
-        "video_caption_with_time_stamp": video_caption_with_time_stamp,
-        "chunked_text": chunked_text,
-        "splitted_video_list": splitted_video_list
-    }
+    return "success"
 
 
 

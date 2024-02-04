@@ -38,15 +38,14 @@ def get_youtube_transcript(video_id) -> dict:
 def get_transcription_result_from_yt(video_id):
 
     result: list = get_youtube_transcript(video_id)
-
+    last_time = 0
     if isinstance(result, list):
         print("got youtube transcript")
-        transcript = ""
         for item in result:
-            transcript += item["text"] + " "
             item['end'] = item['start'] + item['duration']
-
-        return result
+            last_time = item['end']
+        print("result: ", result)
+        return result, last_time
     else:
         return None
 
@@ -89,7 +88,7 @@ def split_video(video_id, start_time, end_time) -> str:
         Output: path to the split video
     """
     filename = VIDEO_PATH + "/" + video_id + ".mp4"
-    output_filename = VIDEO_PATH + "/" + video_id + "_" + start_time + "_" + end_time + ".mp4"
+    output_filename = VIDEO_PATH + "/" + video_id + "_" + str(int(start_time)) + "_" + str(int(end_time)) + ".mp4"
     os.system(f"ffmpeg -i {filename} -ss {start_time} -to {end_time} -c copy {output_filename}")
     return output_filename
 
