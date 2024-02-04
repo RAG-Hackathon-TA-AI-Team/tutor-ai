@@ -2,7 +2,7 @@ import subprocess
 import os
 import re
 
-def extract(src, dest_dir):
+def extract(src, dest_dir, width = 720, height = 480):
     src = src.rstrip('/')
     dest_dir = dest_dir.rstrip('/')
 
@@ -14,12 +14,14 @@ def extract(src, dest_dir):
     keyframe_file_prefix = dest_dir + "/" + src_filename_no_ext + "_frame"
     keyframe_filename = keyframe_file_prefix + "%02d.jpeg"
 
+    resolution = str(width) + "x" + str(height)
+
     args = [
         "ffmpeg",
         "-i", src,
         "-vf", "select='eq(pict_type\,I)',showinfo",
         "-vsync", "2",
-        "-s", "1920x1080",
+        "-s", resolution,
         "-f", "image2", keyframe_filename,
     ]
 
@@ -60,6 +62,4 @@ def extract(src, dest_dir):
     return frames
 
 
-#frames = extract("samples/visionpro.mp4", "samples/frames")
-#for frame in frames:
-#    print(str(frame['pts']) + " " + str(frame['pts_time']) + " " + str(frame['pos']) + " " + str(frame['filename']))
+extract("samples/Tidead.mp4", "samples/frames")
