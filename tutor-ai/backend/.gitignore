@@ -3,3 +3,4 @@ storage
 .env
 app/videoData/
 app/output/
+*.idea
