@@ -6,21 +6,13 @@ import { insertDataIntoMessages } from "./transform";
 import { ChatInput, ChatMessages } from "./ui/chat";
 
 export default function ChatSection() {
-  const {
-    messages,
-    input,
-    isLoading,
-    handleSubmit,
-    handleInputChange,
-    reload,
-    stop,
-    data,
-  } = useChat({
-    api: process.env.NEXT_PUBLIC_CHAT_API,
-    headers: {
-      "Content-Type": "application/json", // using JSON because of vercel/ai 2.2.26
-    },
-  });
+  const { messages, input, isLoading, handleSubmit, handleInputChange, reload, stop, data } =
+    useChat({
+      api: process.env.NEXT_PUBLIC_CHAT_API,
+      headers: {
+        "Content-Type": "application/json", // using JSON because of vercel/ai 2.2.26
+      },
+    });
 
   const transformedMessages = useMemo(() => {
     return insertDataIntoMessages(messages, data);
